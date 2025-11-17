@@ -85,7 +85,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         palette: {
           mode,
           primary: {
-            main: "#1976d2",
+            main: "#d26319ff",
           },
           background: {
             default: mode === "light" ? "#f5f5f5" : "#121212",
