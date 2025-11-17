@@ -8,12 +8,29 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import SvgIcon from "@mui/material/SvgIcon";
 
 interface SensorListProps {
   sensors: Sensor[];
+  onDeleteSensor: (id: number) => void;
 }
 
-export function SensorList({ sensors }: SensorListProps) {
+function DeleteIcon() {
+  return (
+    <SvgIcon fontSize="small" viewBox="0 0 24 24">
+      <path
+        d="M6 6L18 18M18 6L6 18"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </SvgIcon>
+  );
+}
+
+export function SensorList({ sensors, onDeleteSensor }: SensorListProps) {
   return (
     <Paper elevation={1} sx={{ p: 3 }}>
       <Typography variant="h6" component="h2" sx={{ mb: 2 }}>
@@ -33,6 +50,7 @@ export function SensorList({ sensors }: SensorListProps) {
                 <TableCell>Longitude</TableCell>
                 <TableCell>Tipo</TableCell>
                 <TableCell>Data de cadastro</TableCell>
+                <TableCell align="right">Ações</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -50,6 +68,18 @@ export function SensorList({ sensors }: SensorListProps) {
                       timeStyle: "short",
                     })}
                   </TableCell>
+                  <TableCell align="right">
+                    <Tooltip title="Excluir sensor">
+                      <IconButton
+                        size="small"
+                        color="error"
+                        aria-label="Excluir sensor"
+                        onClick={() => onDeleteSensor(sensor.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -59,4 +89,3 @@ export function SensorList({ sensors }: SensorListProps) {
     </Paper>
   );
 }
-
