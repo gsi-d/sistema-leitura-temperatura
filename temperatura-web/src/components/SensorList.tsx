@@ -57,8 +57,8 @@ export function SensorList({ sensors, onDeleteSensor }: SensorListProps) {
               {sensors.map((sensor) => (
                 <TableRow key={sensor.id}>
                   <TableCell>{sensor.name}</TableCell>
-                  <TableCell>{sensor.latitude.toFixed(6)}</TableCell>
-                  <TableCell>{sensor.longitude.toFixed(6)}</TableCell>
+                  <TableCell>{sensor.latitude?.toFixed(6)}</TableCell>
+                  <TableCell>{sensor.longitude?.toFixed(6)}</TableCell>
                   <TableCell>
                     {sensor.type === "indoor" ? "Interno" : "Externo"}
                   </TableCell>

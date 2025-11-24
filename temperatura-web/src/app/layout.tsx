@@ -5,7 +5,7 @@ import { AppProviders } from "@/components/AppProviders";
 export const metadata: Metadata = {
   title: "Sistema de Leitura de Temperatura",
   description:
-    "Aplicação para cadastro, leitura e visualização de dados de sensores de temperatura.",
+    "Aplica��o para cadastro, leitura e visualiza��o de dados de sensores de temperatura.",
 };
 
 export default function RootLayout({
