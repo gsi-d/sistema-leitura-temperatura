@@ -1,13 +1,16 @@
 'use client';
 
+// React e hooks
 import { FormEvent, useEffect, useState } from "react";
-import type { Sensor } from "@/lib/sensorService";
+
+// Serviços
 import {
-  SensorReading,
   createReading,
   initializeReadingIds,
   generateRandomReadings,
 } from "@/lib/readingService";
+
+// Material UI
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -28,24 +31,16 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import SvgIcon from "@mui/material/SvgIcon";
 
+// Utils
+import { RandomReadingFormErrors, ReadingFormErrors, Sensor, SensorReading, StoredReading, StoredSensor } from "@/app/utils/types";
+
+
+// Chaves de armazenamento no localStorage
 const SENSOR_STORAGE_KEY = "sensor-app:sensors";
 const READING_STORAGE_KEY = "sensor-app:readings";
 
-interface ReadingFormErrors {
-  sensorId?: string;
-  temperature?: string;
-}
 
-interface RandomReadingFormErrors {
-  sensorId?: string;
-  count?: string;
-  minTemperature?: string;
-  maxTemperature?: string;
-}
-
-type StoredSensor = Omit<Sensor, "createdAt"> & { createdAt: string };
-type StoredReading = Omit<SensorReading, "createdAt"> & { createdAt: string };
-
+// Ícone de exclusão
 function DeleteIcon() {
   return (
     <SvgIcon fontSize="small" viewBox="0 0 24 24">
@@ -60,6 +55,7 @@ function DeleteIcon() {
 }
 
 export function ReadingsApp() {
+  // Estados utilizados no componente
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [readings, setReadings] = useState<SensorReading[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -68,10 +64,12 @@ export function ReadingsApp() {
     "manual",
   );
 
+  // Estados usados no modo manual
   const [selectedSensorId, setSelectedSensorId] = useState<string>("");
   const [temperature, setTemperature] = useState<string>("");
   const [errors, setErrors] = useState<ReadingFormErrors>({});
 
+  // Estados usados no modo aleatório
   const [randomCount, setRandomCount] = useState<string>("10");
   const [randomMinTemperature, setRandomMinTemperature] =
     useState<string>("20");
@@ -81,6 +79,7 @@ export function ReadingsApp() {
     {},
   );
 
+  // Carregamento inicial dos sensores e leituras do cache do navegador
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -117,6 +116,7 @@ export function ReadingsApp() {
     }
   }, []);
 
+  // Salvamento dos sensores no cache do navegador sempre que mudam
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined") return;
 
@@ -135,6 +135,8 @@ export function ReadingsApp() {
     }
   }, [readings, isHydrated]);
 
+  // Função de envio do formulário de inserção manual
+  // Realiza a validação dos campos e chama o callback onAddReading
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -156,7 +158,7 @@ export function ReadingsApp() {
       return;
     }
 
-    const reading = createReading({
+    const reading: SensorReading = createReading({
       sensorId: Number(selectedSensorId),
       temperature,
     });
@@ -165,6 +167,8 @@ export function ReadingsApp() {
     setTemperature("");
   }
 
+  // Função para geração de leituras aleatórias
+  // Realiza a validação dos campos e chama o callback onAddReading com as leituras geradas
   function handleGenerateRandomReadings() {
     const validationErrors: RandomReadingFormErrors = {};
 
@@ -197,7 +201,7 @@ export function ReadingsApp() {
       return;
     }
 
-    const readingsToAdd = generateRandomReadings({
+    const readingsToAdd: SensorReading[] = generateRandomReadings({
       sensorId: Number(selectedSensorId),
       count: countNumber,
       minTemperature: minNumber,

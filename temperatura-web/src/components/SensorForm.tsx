@@ -1,38 +1,34 @@
 'use client';
 
+// React e hooks
 import { useState, FormEvent } from "react";
 import {
-  Sensor,
-  SensorType,
   createSensor,
   isValidLatitude,
   isValidLongitude,
 } from "@/lib/sensorService";
+
+// Material UI
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 
-interface SensorFormProps {
-  onAddSensor: (sensor: Sensor) => void;
-}
-
-interface FormErrors {
-  name?: string;
-  latitude?: string;
-  longitude?: string;
-}
+// Utils
+import { FormErrors, SensorFormProps } from "@/app/utils/types";
 
 export function SensorForm({ onAddSensor }: SensorFormProps) {
-  const [name, setName] = useState("");
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [type, setType] = useState<SensorType>("outdoor");
-  const [errors, setErrors] = useState<FormErrors>({});
 
+  // Estados do formulário
+  const [name, setName] = useState(""); // Nome do sensor
+  const [latitude, setLatitude] = useState(""); // Latitude do sensor
+  const [longitude, setLongitude] = useState(""); // Longitude do sensor
+  const [errors, setErrors] = useState<FormErrors>({}); // Erros de validação
+
+  // Função chamada ao submeter o formulário
+  // Realiza a validação dos campos e chama o callback onAddSensor
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -56,19 +52,19 @@ export function SensorForm({ onAddSensor }: SensorFormProps) {
       return;
     }
 
+    // Criação do objeto sensor
     const sensor = createSensor({
       name,
       latitude,
       longitude,
-      type,
     });
 
+    // Chamada ao callback de inserção do sensor
     onAddSensor(sensor);
 
     setName("");
     setLatitude("");
     setLongitude("");
-    setType("outdoor");
     setErrors({});
   }
 
@@ -121,22 +117,6 @@ export function SensorForm({ onAddSensor }: SensorFormProps) {
               error={Boolean(errors.longitude)}
               helperText={errors.longitude}
             />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 4 }}>
-            <TextField
-              select
-              fullWidth
-              id="type"
-              label="Tipo de ambiente"
-              value={type}
-              onChange={(event) =>
-                setType(event.target.value as SensorType)
-              }
-            >
-              <MenuItem value="indoor">Interno</MenuItem>
-              <MenuItem value="outdoor">Externo</MenuItem>
-            </TextField>
           </Grid>
 
           <Grid size={{ xs: 12 }}>

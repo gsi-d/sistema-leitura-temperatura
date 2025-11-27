@@ -110,7 +110,6 @@ export function SensorsMapLeaflet() {
           <Box
             sx={{
               flex: 1,
-              //minHeight: "60vh",
               height: "1000px",
               borderRadius: 1,
               overflow: "hidden",
@@ -139,8 +138,6 @@ export function SensorsMapLeaflet() {
                     Latitude: {sensor.latitude.toFixed(6)}
                     <br />
                     Longitude: {sensor.longitude.toFixed(6)}
-                    <br />
-                    Tipo: {sensor.type === "indoor" ? "Interno" : "Externo"}
                   </Popup>
                 </Marker>
               ))}

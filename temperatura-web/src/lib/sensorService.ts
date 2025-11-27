@@ -1,20 +1,5 @@
-export type SensorType = "indoor" | "outdoor";
+import { CreateSensorInput, Sensor } from "@/app/utils/types";
 
-export interface Sensor {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  type: SensorType;
-  createdAt: Date;
-}
-
-export interface CreateSensorInput {
-  name: string;
-  latitude: string;
-  longitude: string;
-  type: SensorType;
-}
 
 let nextId = 1;
 
@@ -24,7 +9,6 @@ export function createSensor(input: CreateSensorInput): Sensor {
     name: input.name,
     latitude: parseFloat(input.latitude),
     longitude: parseFloat(input.longitude),
-    type: input.type,
     createdAt: new Date(),
   };
 }

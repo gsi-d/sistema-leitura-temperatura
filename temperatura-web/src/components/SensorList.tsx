@@ -1,4 +1,4 @@
-import { Sensor } from "@/lib/sensorService";
+// Material UI
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
@@ -12,11 +12,10 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import SvgIcon from "@mui/material/SvgIcon";
 
-interface SensorListProps {
-  sensors: Sensor[];
-  onDeleteSensor: (id: number) => void;
-}
+// Utils
+import { SensorListProps } from "@/app/utils/types";
 
+// Ícone de exclusão
 function DeleteIcon() {
   return (
     <SvgIcon fontSize="small" viewBox="0 0 24 24">
@@ -30,6 +29,7 @@ function DeleteIcon() {
   );
 }
 
+// Recebe os sensores e a função de exclusão via props para renderizar a lista
 export function SensorList({ sensors, onDeleteSensor }: SensorListProps) {
   return (
     <Paper elevation={1} sx={{ p: 3 }}>
@@ -48,7 +48,6 @@ export function SensorList({ sensors, onDeleteSensor }: SensorListProps) {
                 <TableCell>Nome</TableCell>
                 <TableCell>Latitude</TableCell>
                 <TableCell>Longitude</TableCell>
-                <TableCell>Tipo</TableCell>
                 <TableCell>Data de cadastro</TableCell>
                 <TableCell align="right">Ações</TableCell>
               </TableRow>
@@ -59,9 +58,6 @@ export function SensorList({ sensors, onDeleteSensor }: SensorListProps) {
                   <TableCell>{sensor.name}</TableCell>
                   <TableCell>{sensor.latitude?.toFixed(6)}</TableCell>
                   <TableCell>{sensor.longitude?.toFixed(6)}</TableCell>
-                  <TableCell>
-                    {sensor.type === "indoor" ? "Interno" : "Externo"}
-                  </TableCell>
                   <TableCell>
                     {sensor.createdAt.toLocaleString("pt-BR", {
                       dateStyle: "short",

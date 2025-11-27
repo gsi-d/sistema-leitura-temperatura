@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Sensor } from "@/lib/sensorService";
-import type { SensorReading } from "@/lib/readingService";
-import { createReading, initializeReadingIds } from "@/lib/readingService";
+// React e hooks
 import Script from "next/script";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+// Serviços
+import { createReading, initializeReadingIds } from "@/lib/readingService";
+
+// Material UI
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -13,11 +16,12 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 
+// Utils
+import { Sensor, SensorReading, StoredReading, StoredSensor } from "@/app/utils/types";
+
+// Chaves de armazenamento no localStorage
 const SENSOR_STORAGE_KEY = "sensor-app:sensors";
 const READING_STORAGE_KEY = "sensor-app:readings";
-
-type StoredSensor = Omit<Sensor, "createdAt"> & { createdAt: string };
-type StoredReading = Omit<SensorReading, "createdAt"> & { createdAt: string };
 
 declare global {
   interface Window {

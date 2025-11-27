@@ -1,22 +1,29 @@
-'use client';
+"use client";
 
+// React e hooks
 import { useEffect, useState } from "react";
-import { Sensor, initializeSensorIds } from "@/lib/sensorService";
-import { SensorForm } from "./SensorForm";
-import { SensorList } from "./SensorList";
+import { initializeSensorIds } from "@/lib/sensorService";
+
+// Material UI
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 
+// Componentes internos
+import { SensorForm } from "./SensorForm";
+import { SensorList } from "./SensorList";
+import { Sensor } from "@/app/utils/types";
+
 const STORAGE_KEY = "sensor-app:sensors";
 
 export function SensorApp() {
+  // Estados utilizados no componente
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  // Na montagem do componente, carregamos os sensores do cache do navegador
   useEffect(() => {
     if (typeof window === "undefined") return;
-
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (!stored) {
@@ -24,15 +31,18 @@ export function SensorApp() {
         return;
       }
 
+      // Parse dos sensores armazenados
       const parsed = JSON.parse(stored) as Array<
         Omit<Sensor, "createdAt"> & { createdAt: string }
       >;
 
+      // Restauração dos sensores com a conversão da data
       const restored: Sensor[] = parsed.map((item) => ({
         ...item,
         createdAt: new Date(item.createdAt),
       }));
 
+      // Atualização dos estados
       setSensors(restored);
       initializeSensorIds(restored);
     } catch (error) {
@@ -42,6 +52,7 @@ export function SensorApp() {
     }
   }, []);
 
+  // Sempre que os sensores mudam, salvamos no cache do navegador
   useEffect(() => {
     if (!isHydrated || typeof window === "undefined") return;
 
@@ -57,10 +68,12 @@ export function SensorApp() {
     }
   }, [sensors, isHydrated]);
 
+  // Funções para inserir sensores
   function handleAddSensor(sensor: Sensor) {
     setSensors((previous) => [...previous, sensor]);
   }
 
+  // Função para deletar sensores
   function handleDeleteSensor(id: number) {
     setSensors((previous) => previous.filter((sensor) => sensor.id !== id));
   }
@@ -72,8 +85,7 @@ export function SensorApp() {
           Sistema de Leitura de Temperatura
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Cadastro de sensores com georreferenciamento (latitude e
-          longitude).
+          Cadastro de sensores com georreferenciamento (latitude e longitude).
         </Typography>
       </Box>
 

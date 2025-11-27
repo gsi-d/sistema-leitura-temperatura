@@ -1,24 +1,4 @@
-import type { Sensor } from "./sensorService";
-
-export interface SensorReading {
-  id: number;
-  sensorId: Sensor["id"];
-  temperature: number;
-  createdAt: Date;
-}
-
-export interface CreateReadingInput {
-  sensorId: Sensor["id"];
-  temperature: string;
-  createdAt?: Date;
-}
-
-export interface GenerateRandomReadingsInput {
-  sensorId: Sensor["id"];
-  count: number;
-  minTemperature: number;
-  maxTemperature: number;
-}
+import { CreateReadingInput, GenerateRandomReadingsInput, SensorReading } from "@/app/utils/types";
 
 let nextReadingId = 1;
 
@@ -45,6 +25,8 @@ export function initializeReadingIds(existingReadings: SensorReading[]): void {
   nextReadingId = maxId + 1;
 }
 
+// Gera leituras aleatórias para um sensor específico com base nos parâmetros fornecidos
+// Retorna um array contendo as leituras geradas
 export function generateRandomReadings(
   input: GenerateRandomReadingsInput,
 ): SensorReading[] {
@@ -54,6 +36,7 @@ export function generateRandomReadings(
     return [];
   }
 
+  // Garante que o valor de temperatura mínima seja menor que o máximo e vice-versa
   const lower =
     minTemperature <= maxTemperature ? minTemperature : maxTemperature;
   const upper =
