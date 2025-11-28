@@ -23,6 +23,7 @@ import { Sensor, SensorReading, StoredReading, StoredSensor } from "@/app/utils/
 const SENSOR_STORAGE_KEY = "sensor-app:sensors";
 const READING_STORAGE_KEY = "sensor-app:readings";
 
+// Extende window para dizer que pode existir window.google
 declare global {
   interface Window {
     google?: any;
@@ -33,18 +34,20 @@ export function RealTimeReadings() {
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [selectedSensorId, setSelectedSensorId] = useState<string>("");
 
-  const [currentTemperature, setCurrentTemperature] = useState<number | null>(
+  const [currentTemperature, setCurrentTemperature] = useState<number | null>( // Temperatura atual
     null,
   );
-  const [lastReadingTime, setLastReadingTime] = useState<Date | null>(null);
+  const [lastReadingTime, setLastReadingTime] = useState<Date | null>(null); // Data da última leitura
 
-  const [isRunning, setIsRunning] = useState(false);
-  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
-  const [isGoogleChartsReady, setIsGoogleChartsReady] = useState(false);
+  // Estados da simulação
+  const [isRunning, setIsRunning] = useState(false); // Indica se a simulação está em execução
+  const [isGoogleLoaded, setIsGoogleLoaded] = useState(false); // Indica se o Google Charts foi carregado
+  const [isGoogleChartsReady, setIsGoogleChartsReady] = useState(false); // Indica se o Google Charts está pronto
 
-  const chartContainerRef = useRef<HTMLDivElement | null>(null);
-  const intervalRef = useRef<number | null>(null);
+  const chartContainerRef = useRef<HTMLDivElement | null>(null); // Referência para onde o gauge será desenhado
+  const intervalRef = useRef<number | null>(null); // Referência para o intervalo da simulação
 
+  // Carregamento inicial dos sensores e leituras
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -82,6 +85,7 @@ export function RealTimeReadings() {
     }
   }, []);
 
+  // Verifica se o Google Charts foi carregado
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -90,6 +94,7 @@ export function RealTimeReadings() {
     }
   }, []);
 
+  // Verifica se o Google Charts está pronto
   useEffect(() => {
     if (!isGoogleLoaded || typeof window === "undefined") return;
 
@@ -101,15 +106,18 @@ export function RealTimeReadings() {
       return;
     }
 
+    // Carrega o Google Charts
     google.charts.load("current", {
       packages: ["gauge"],
       language: "pt-BR",
     });
+
     google.charts.setOnLoadCallback(() => {
       setIsGoogleChartsReady(true);
     });
   }, [isGoogleLoaded]);
 
+  // Verifica se pode iniciar a simulação
   const canStart = useMemo(
     () => Boolean(selectedSensorId) && sensors.length > 0,
     [selectedSensorId, sensors.length],
@@ -127,26 +135,30 @@ export function RealTimeReadings() {
 
     const sensorIdNumber = Number(selectedSensorId);
 
+    // Geração de leituras aleatórias
     function generateNextTemperature(previous: number | null): number {
-      const base = previous ?? 24;
-      const variation = (Math.random() - 0.5) * 2.5;
+      const base = previous ?? 24; // Temperatura base (última leitura ou default)
+      const variation = (Math.random() - 0.5) * 2.5; // Variação aleatória (entre -2.5 e 2.5)
       const raw = base + variation;
       // Limite de segurança.
       return Math.min(50, Math.max(-10, raw));
     }
 
+    // Calcula a proxima leitura
     function emitReading() {
       const nextTemperature = generateNextTemperature(currentTemperature);
       setCurrentTemperature(nextTemperature);
       const createdAt = new Date();
       setLastReadingTime(createdAt);
 
+      // Cria o objeto de leitura
       const reading = createReading({
         sensorId: sensorIdNumber,
         temperature: nextTemperature.toFixed(1),
         createdAt,
       });
 
+      // Salva a leitura no localStorage
       try {
         const stored = window.localStorage.getItem(READING_STORAGE_KEY);
         const parsed = stored ? (JSON.parse(stored) as StoredReading[]) : [];
@@ -166,8 +178,10 @@ export function RealTimeReadings() {
       }
     }
 
+    // Inicia a emissão de leituras
     emitReading();
 
+    // Inicia o intervalo
     intervalRef.current = window.setInterval(emitReading, 3000);
 
     return () => {
@@ -178,7 +192,9 @@ export function RealTimeReadings() {
     };
   }, [isRunning, selectedSensorId]);
 
+  // Desenha o gauge
   useEffect(() => {
+
     if (!isGoogleChartsReady || !chartContainerRef.current) {
       return;
     }
@@ -188,11 +204,13 @@ export function RealTimeReadings() {
 
     const value = currentTemperature ?? 0;
 
+    // Cria os dados para o gauge
     const data = google.visualization.arrayToDataTable([
       ["Label", "Value"],
       ["°C", value],
     ]);
 
+    // Configura as opções do gauge
     const options = {
       width: 420,
       height: 200,
@@ -205,14 +223,17 @@ export function RealTimeReadings() {
       max: 50,
     };
 
+    // Desenha o gauge na primeira vez ou se a temperatura mudar
     const chart = new google.visualization.Gauge(chartContainerRef.current);
     chart.draw(data, options);
+
   }, [isGoogleChartsReady, currentTemperature]);
 
   const hasSensors = sensors.length > 0;
 
   return (
     <>
+      {/* Carrega o Google Charts */}
       <Script
         src="https://www.gstatic.com/charts/loader.js"
         strategy="afterInteractive"

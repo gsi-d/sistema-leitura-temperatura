@@ -1,21 +1,24 @@
 'use client';
 
+// React e hooks
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Sensor } from "@/lib/sensorService";
-import type { SensorReading } from "@/lib/readingService";
 import Script from "next/script";
+
+// Material UI
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 
+// Utils
+import { Sensor, SensorReading, StoredReading, StoredSensor } from "@/app/utils/types";
+
+// Chaves de armazenamento no localStorage
 const SENSOR_STORAGE_KEY = "sensor-app:sensors";
 const READING_STORAGE_KEY = "sensor-app:readings";
 
-type StoredSensor = Omit<Sensor, "createdAt"> & { createdAt: string };
-type StoredReading = Omit<SensorReading, "createdAt"> & { createdAt: string };
-
+// Extende window para dizer que pode existir window.google
 declare global {
   interface Window {
     // Namespace do Google Charts carregado via script externo.
@@ -24,14 +27,17 @@ declare global {
 }
 
 export function ReadingsHistory() {
+  // Estados utilizados no componente
   const [sensors, setSensors] = useState<Sensor[]>([]);
   const [readings, setReadings] = useState<SensorReading[]>([]);
   const [selectedSensorId, setSelectedSensorId] = useState<string>("");
   const [isGoogleLoaded, setIsGoogleLoaded] = useState(false);
   const [isGoogleChartsReady, setIsGoogleChartsReady] = useState(false);
 
+  // Referência para onde o gadget será desenhado
   const chartContainerRef = useRef<HTMLDivElement | null>(null);
 
+  // Carregamento inicial dos sensores e leituras
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -91,6 +97,7 @@ export function ReadingsHistory() {
       return;
     }
 
+    // Caso contrário, carregamos o script e marcamos como pronto quando ele estiver carregado.
     google.charts.load("current", {
       packages: ["corechart"],
       language: "pt-BR",
@@ -100,6 +107,7 @@ export function ReadingsHistory() {
     });
   }, [isGoogleLoaded]);
 
+  // Filtra as leituras para o sensor selecionado
   const readingsForSelectedSensor = useMemo(() => {
     if (!selectedSensorId) {
       return [];
@@ -115,6 +123,7 @@ export function ReadingsHistory() {
       );
   }, [readings, selectedSensorId]);
 
+  // Desenha o gadget assim que ele estiver pronto
   useEffect(() => {
     if (!isGoogleChartsReady || !chartContainerRef.current) {
       return;
@@ -129,20 +138,23 @@ export function ReadingsHistory() {
       return;
     }
 
+    // Cria o DataTable do google charts
     const dataTable = new google.visualization.DataTable();
     dataTable.addColumn("datetime", "Data e hora");
     dataTable.addColumn("number", "Temperatura (°C)");
 
+    // Adiciona as leituras ao DataTable
     readingsForSelectedSensor.forEach((reading) => {
       dataTable.addRow([reading.createdAt, reading.temperature]);
     });
 
+    // Configura as opções do google charts
     const options = {
       title: "Histórico de temperatura",
       legend: { position: "bottom" },
       hAxis: {
         title: "Data e hora",
-        format: "dd/MM/yyyy HH:mm",
+        format: "dd/MM HH:mm"        
       },
       vAxis: {
         title: "Temperatura (°C)",
@@ -151,11 +163,14 @@ export function ReadingsHistory() {
       chartArea: { left: 60, right: 16, top: 24, bottom: 60 },
     };
 
+    // Cria instância do google charts
     const chart = new google.visualization.LineChart(
       chartContainerRef.current,
     );
+    // Desenha o gadget
     chart.draw(dataTable, options);
 
+    // Atualiza o gadget quando a janela for redimensionada
     function handleResize() {
       chart.draw(dataTable, options);
     }
@@ -171,9 +186,10 @@ export function ReadingsHistory() {
 
   return (
     <>
+      {/* Script do google charts */}
       <Script
         src="https://www.gstatic.com/charts/loader.js"
-        strategy="afterInteractive"
+        strategy="afterInteractive" // Carrega o script assim que a navegação estiver pronta
         onLoad={() => setIsGoogleLoaded(true)}
       />
 
@@ -206,6 +222,7 @@ export function ReadingsHistory() {
           </Box>
         )}
 
+        {/* Gadget de gráficos */}
         <Box
           ref={chartContainerRef}
           sx={{
